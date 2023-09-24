@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.safestring import mark_safe
+from where_to_go_v2 import settings
 
 
 class PlaceName(models.Model):
@@ -13,7 +14,7 @@ class PlaceName(models.Model):
     point_lat = models.FloatField(verbose_name="Широта точки", blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return f'pk:{self.pk} {self.title}'
 
     class Meta:
         verbose_name = 'Пост'
@@ -38,6 +39,10 @@ class PlaceImage(models.Model):
         if self.picture:
             return mark_safe('<img src="{}" width="100" height="100" />'.format(self.picture.url))
         return ""
+
+    @property
+    def get_absolute_image_url(self):
+        return "{0}{1}".format(settings.MEDIA_URL, self.picture.url)
 
 
 
