@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 
 
 class PlaceName(models.Model):
@@ -7,6 +8,9 @@ class PlaceName(models.Model):
     long_description = models.TextField('Полное описание', blank=True)
     longitude = models.FloatField('Долгота точки', blank=True)
     latitude = models.FloatField('Широта точки', blank=True)
+    slug = models.SlugField('Название в виде url', max_length=200, blank=True, null=True)
+    point_lon = models.FloatField(verbose_name="Долгота точки", blank=True, null=True)
+    point_lat = models.FloatField(verbose_name="Широта точки", blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -28,6 +32,12 @@ class PlaceImage(models.Model):
         verbose_name = 'Картинка'
         verbose_name_plural = 'Картинки'
         ordering = ['numb']
+
+    @property
+    def photo_preview(self):
+        if self.picture:
+            return mark_safe('<img src="{}" width="100" height="100" />'.format(self.picture.url))
+        return ""
 
 
 

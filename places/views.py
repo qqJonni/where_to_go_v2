@@ -1,34 +1,42 @@
 from django.shortcuts import render
+import json
+from places.models import PlaceName
+
+
+def serialize_post(post):
+    data = {
+        'title': post.title,
+        'imgs': [pic.picture.url for pic in post.pictures.all().order_by('numb')],
+        'short_description': post.short_description,
+        'long_description': post.long_description,
+        'coordinates': {
+            'longitude': post.longitude,
+            'latitude': post.latitude,
+        }
+    }
+    with open(f"static/places/{post.slug}.json", "w") as outfile:
+        json.dump(data, outfile)
+
+    return {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [post.point_lon, post.point_lat]
+        },
+        "properties": {
+            "title": post.title.split("«")[1],
+            "placeId": post.slug,
+            "detailsUrl": f'static/json/{post.slug}.json'
+        }
+    }
 
 
 def index(request):
-    places_on_map = {'places': {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [37.62, 55.793676]
-                },
-                "properties": {
-                    "title": "«Легенды Москвы",
-                    "placeId": "moscow_legends",
-                    "detailsUrl": "static/places/moscow_legends.json"
-                }
-            },
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [37.64, 55.753676]
-                },
-                "properties": {
-                    "title": "Крыши24.рф",
-                    "placeId": "roofs24",
-                    "detailsUrl": "static/places/roofs24.json"
-                }
-            }
-        ]
-    }}
-    return render(request, 'places/index.html', context=places_on_map)
+    posts = PlaceName.objects.all()
+    context = {
+        'places_posts': {"type": "FeatureCollection",
+                         "features": [
+                             serialize_post(post) for post in posts
+                         ]}
+    }
+    return render(request, 'places/index.html', context)
