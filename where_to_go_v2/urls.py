@@ -21,13 +21,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from places.views import index
+from places.views import details_json
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', index, name='index'),
-    path('places/', include('endpoint.urls')),
     path('tinymce/', include('tinymce.urls')),
+    path('<int:pk>', details_json, name='details_json')
 
 ]
 

@@ -10,7 +10,7 @@ class PlaceName(models.Model):
     long_description = HTMLField('Полное описание', blank=True)
     longitude = models.FloatField('Долгота точки', blank=True)
     latitude = models.FloatField('Широта точки', blank=True)
-    slug = models.SlugField('Название в виде url', max_length=200, blank=True, null=True)
+    # slug = models.SlugField('Название в виде url', max_length=200, blank=True, null=True)
 
     def __str__(self):
         return f'pk:{self.pk} {self.title}'
