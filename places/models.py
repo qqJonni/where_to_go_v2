@@ -10,8 +10,6 @@ class PlaceName(models.Model):
     longitude = models.FloatField('Долгота точки', blank=True)
     latitude = models.FloatField('Широта точки', blank=True)
     slug = models.SlugField('Название в виде url', max_length=200, blank=True, null=True)
-    point_lon = models.FloatField(verbose_name="Долгота точки", blank=True, null=True)
-    point_lat = models.FloatField(verbose_name="Широта точки", blank=True, null=True)
 
     def __str__(self):
         return f'pk:{self.pk} {self.title}'
@@ -37,7 +35,7 @@ class PlaceImage(models.Model):
     @property
     def photo_preview(self):
         if self.picture:
-            return mark_safe('<img src="{}" width="100" height="100" />'.format(self.picture.url))
+            return mark_safe('<img src="{}" height="200" />'.format(self.picture.url))
         return ""
 
     @property
