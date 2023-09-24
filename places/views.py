@@ -1,49 +1,50 @@
 from django.shortcuts import render, get_object_or_404
-from places.models import PlaceName
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 
+from places.models import PlaceName
 
-def serialize_post(post):
-    redirect_url = reverse('details_json', args=[post.pk])
+
+def serialize_post(location):
+    redirect_url = reverse('get_details_json', args=[location.pk])
 
     return {
         "type": "Feature",
         "geometry": {
             "type": "Point",
-            "coordinates": [post.longitude, post.latitude]
+            "coordinates": [location.longitude, location.latitude]
         },
         "properties": {
-            "title": post.title,
+            "title": location.title,
             "detailsUrl": redirect_url
         }
     }
 
 
 def index(request):
-    posts = PlaceName.objects.all()
+    locations = PlaceName.objects.all()
     context = {
         'places_posts': {"type": "FeatureCollection",
                          "features": [
-                             serialize_post(post) for post in posts
+                             serialize_post(location) for location in locations
                          ]}
     }
     return render(request, 'places/index.html', context)
 
 
-def details_json(request, pk):
-    post = get_object_or_404(PlaceName, pk=pk)
-    post_data = {
-        "title": post.title,
+def get_details_json(request, pk):
+    location = get_object_or_404(PlaceName, pk=pk)
+    post_info = {
+        "title": location.title,
         "imgs": [
-            pic.picture.url for pic in post.pictures.all().order_by('numb')
+            pic.picture.url for pic in location.pictures.all().order_by('sequence_number')
         ],
-        "description_short": post.short_description,
-        "description_long": post.long_description,
+        "description_short": location.short_description,
+        "description_long": location.long_description,
         "coordinates": {
-            "lng": post.longitude,
-            "lat": post.latitude
+            "lng": location.longitude,
+            "lat": location.latitude
         }
     }
-    output = JsonResponse(post_data, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
+    output = JsonResponse(post_info, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
     return HttpResponse(output, content_type="application/json")

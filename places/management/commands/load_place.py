@@ -34,8 +34,8 @@ def upload_data_to_db(url):
     """ Загружаем данные в БД """
     response = requests.get(url)
     response.raise_for_status()
-    json_data = response.json()
-    imgs = json_data["imgs"]
+    place_raw = response.json()
+    imgs = place_raw["imgs"]
     img_names = []
     img_path = Path(base_path, 'static/imgs_data')
     img_path.mkdir(parents=True, exist_ok=True)
@@ -43,20 +43,15 @@ def upload_data_to_db(url):
         img_name, _ = get_filename_and_ext(img_url)
         img_names.append(img_name)
         download_img(img_url, img_name, img_path)
-    title = json_data["title"]
-    short_description = json_data["description_short"]
-    long_description = json_data["description_long"]
-    longitude = json_data["coordinates"]["lng"]
-    latitude = json_data["coordinates"]["lat"]
-    post = PlaceName.objects.create(
-        title=title,
-        short_description=short_description,
-        long_description=long_description,
-        latitude=latitude,
-        longitude=longitude,
+    location = PlaceName.objects.create(
+        title=place_raw["title"],
+        short_description=place_raw["description_short"],
+        long_description=place_raw["description_long"],
+        latitude=place_raw["coordinates"]["lat"],
+        longitude=place_raw["coordinates"]["lng"]
     )
     for img in img_names:
-        img_upload = PlaceImage.objects.create(place=post)
+        img_upload = PlaceImage.objects.create(place=location)
         with open(f'{img_path}/{img}', 'rb') as f:
             file = f.read()
             img_upload.picture.save(img, ContentFile(file), save=True)
