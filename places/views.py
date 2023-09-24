@@ -1,21 +1,11 @@
 from django.shortcuts import render
 import json
 from places.models import PlaceName
+from django.urls import reverse
 
 
 def serialize_post(post):
-    data = {
-        'title': post.title,
-        'imgs': [pic.picture.url for pic in post.pictures.all().order_by('numb')],
-        'short_description': post.short_description,
-        'long_description': post.long_description,
-        'coordinates': {
-            'longitude': post.longitude,
-            'latitude': post.latitude,
-        }
-    }
-    with open(f"static/places/{post.slug}.json", "w") as outfile:
-        json.dump(data, outfile)
+    redirect_url = reverse('details_json', args=[post.pk])
 
     return {
         "type": "Feature",
@@ -26,7 +16,7 @@ def serialize_post(post):
         "properties": {
             "title": post.title.split("«")[1],
             "placeId": post.slug,
-            "detailsUrl": f'static/json/{post.slug}.json'
+            "detailsUrl": redirect_url
         }
     }
 
