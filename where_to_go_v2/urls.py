@@ -26,7 +26,8 @@ from places.views import index
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', index, name='index'),
-    path('places/', include('endpoint.urls'))
+    path('places/', include('endpoint.urls')),
+    path('tinymce/', include('tinymce.urls')),
 
 ]
 

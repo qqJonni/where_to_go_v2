@@ -1,12 +1,13 @@
 from django.db import models
 from django.utils.safestring import mark_safe
 from where_to_go_v2 import settings
+from tinymce.models import HTMLField
 
 
 class PlaceName(models.Model):
     title = models.CharField('Заголовок', max_length=128)
     short_description = models.TextField('Короткое описание', blank=True)
-    long_description = models.TextField('Полное описание', blank=True)
+    long_description = HTMLField('Полное описание', blank=True)
     longitude = models.FloatField('Долгота точки', blank=True)
     latitude = models.FloatField('Широта точки', blank=True)
     slug = models.SlugField('Название в виде url', max_length=200, blank=True, null=True)
