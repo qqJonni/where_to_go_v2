@@ -1,10 +1,21 @@
 from django.contrib import admin
 from places.models import PlaceName, PlaceImage
+from adminsortable2.admin import SortableAdminBase, SortableInlineAdminMixin
+from adminsortable.utils import get_is_sortable
 
 
-class PicsInline(admin.TabularInline):
+class PicsInline(SortableInlineAdminMixin, admin.TabularInline):
     model = PlaceImage
     readonly_fields = ["photo_preview"]
+
+    def queryset(self, request):
+        qs = super(PicsInline, self).queryset(request).filter(
+            numb__icontains='foo')
+        if get_is_sortable(qs):
+            self.model.is_sortable = True
+        else:
+            self.model.is_sortable = False
+        return qs
 
     def photo_preview(self, obj):
         return obj.photo_preview
@@ -14,7 +25,7 @@ class PicsInline(admin.TabularInline):
 
 
 @admin.register(PlaceName)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(SortableAdminBase, admin.ModelAdmin):
     fields = ["title", "short_description", "long_description", "latitude", "longitude", "slug"]
     list_display = ['title']
     inlines = [PicsInline, ]

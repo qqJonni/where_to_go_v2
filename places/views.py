@@ -1,5 +1,4 @@
 from django.shortcuts import render
-import json
 from places.models import PlaceName
 from django.urls import reverse
 
@@ -11,7 +10,7 @@ def serialize_post(post):
         "type": "Feature",
         "geometry": {
             "type": "Point",
-            "coordinates": [post.point_lon, post.point_lat]
+            "coordinates": [post.longitude, post.latitude]
         },
         "properties": {
             "title": post.title.split("«")[1],
