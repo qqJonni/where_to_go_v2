@@ -13,7 +13,7 @@ def serialize_post(post):
             "coordinates": [post.longitude, post.latitude]
         },
         "properties": {
-            "title": post.title.split("«")[1],
+            "title": post.title,
             "placeId": post.slug,
             "detailsUrl": redirect_url
         }

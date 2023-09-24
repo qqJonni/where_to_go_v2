@@ -6,6 +6,7 @@ __pycache__/
 *.DS_Store
 # C extensions
 *.so
+/media
 */__pycache__/
 # Distribution / packaging
 .Python
@@ -139,7 +140,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-/media
 /static/.gitkeep
 .idea/
 /.handler-saves/
