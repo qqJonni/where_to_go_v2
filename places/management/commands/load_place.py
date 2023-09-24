@@ -43,12 +43,14 @@ def upload_data_to_db(url):
         img_name, _ = get_filename_and_ext(img_url)
         img_names.append(img_name)
         download_img(img_url, img_name, img_path)
-    location = PlaceName.objects.create(
-        title=place_raw["title"],
+    title = place_raw["title"]
+    location, created = PlaceName.objects.update_or_create(
+        title=title,
         short_description=place_raw["description_short"],
         long_description=place_raw["description_long"],
         latitude=place_raw["coordinates"]["lat"],
-        longitude=place_raw["coordinates"]["lng"]
+        longitude=place_raw["coordinates"]["lng"],
+        defaults={'title': title}
     )
     for img in img_names:
         img_upload = PlaceImage.objects.create(place=location)
