@@ -1,28 +1,18 @@
 from django.contrib import admin
 from adminsortable2.admin import SortableAdminBase, SortableInlineAdminMixin
-from adminsortable.utils import get_is_sortable
 
 from places.models import PlaceName, PlaceImage
 
 
 class PicsInline(SortableInlineAdminMixin, admin.TabularInline):
     model = PlaceImage
-    readonly_fields = ["photo_preview"]
+    readonly_fields = ["show_photo_preview"]
 
-    def queryset(self, request):
-        qs = super(PicsInline, self).queryset(request).filter(
-            numb__icontains='foo')
-        if get_is_sortable(qs):
-            self.model.is_sortable = True
-        else:
-            self.model.is_sortable = False
-        return qs
+    def show_photo_preview(self, obj):
+        return obj.show_photo_preview
 
-    def photo_preview(self, obj):
-        return obj.photo_preview
-
-    photo_preview.short_description = 'Photo Preview'
-    photo_preview.allow_tags = True
+    show_photo_preview.short_description = 'Photo Preview'
+    show_photo_preview.allow_tags = True
 
 
 @admin.register(PlaceName)
@@ -34,12 +24,11 @@ class PostAdmin(SortableAdminBase, admin.ModelAdmin):
 
 @admin.register(PlaceImage)
 class PicAdmin(admin.ModelAdmin):
-    list_display = ['sequence_number', "place", "photo_preview"]
-    ordering = ['sequence_number', ]
-    readonly_fields = ["photo_preview"]
+    ordering = ['sequence_number']
+    readonly_fields = ["show_photo_preview"]
 
-    def photo_preview(self, obj):
-        return obj.photo_preview
+    def show_photo_preview(self, obj):
+        return obj.show_photo_preview
 
-    photo_preview.short_description = 'Photo Preview'
-    photo_preview.allow_tags = True
+    show_photo_preview.short_description = 'Photo Preview'
+    show_photo_preview.allow_tags = True

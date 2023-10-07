@@ -38,6 +38,11 @@ python manage.py runserver
 
 Войти в панель [администратора http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
 
+Чтобы загрузить собственный интент из JSON файла (который должен находиться в дериктории проекта), необходимо выполнить команду:
+```properties
+python manage.py load_place <название файла>
+
+```
 
 ### Настройки
 
@@ -45,7 +50,7 @@ python manage.py runserver
 Доступны 3 переменные:
 - `ALLOWED_HOSTS` — Разрешенные для подключения хосты
 - `SECRET_KEY` — Секретный ключ сайта
-- `DEBUG` — True или False
+- `DEBUG` — True или False (True - для отладки приложения, False - для боевого режима (при деплое), здесь можно посмотреть более подробную информацию; https://docs.djangoproject.com/en/4.2/ref/settings/#debug)
 
 
 ### Источники данных

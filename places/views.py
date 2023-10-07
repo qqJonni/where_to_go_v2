@@ -1,6 +1,6 @@
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.http import HttpResponse, JsonResponse
 
 from places.models import PlaceName
 
@@ -34,7 +34,7 @@ def index(request):
 
 def get_details_json(request, pk):
     location = get_object_or_404(PlaceName, pk=pk)
-    post_info = {
+    location_information = {
         "title": location.title,
         "imgs": [
             pic.picture.url for pic in location.pictures.all().order_by('sequence_number')
@@ -46,5 +46,4 @@ def get_details_json(request, pk):
             "lat": location.latitude
         }
     }
-    output = JsonResponse(post_info, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
-    return HttpResponse(output, content_type="application/json")
+    return JsonResponse(location_information, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})

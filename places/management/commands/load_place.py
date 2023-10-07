@@ -1,13 +1,14 @@
 import argparse
+import requests
 from os.path import splitext, split
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
 
-from places.models import PlaceName, PlaceImage
-from where_to_go_v2 import settings
-import requests
 from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
+
+from places.models import PlaceName, PlaceImage
+from where_to_go_v2 import settings
 
 
 base_path = settings.BASE_DIR
@@ -31,18 +32,16 @@ def download_img(img_url, img_name, img_path):
 
 
 def upload_data_to_db(url):
-    """ Загружаем данные в БД """
+    """Загружаем данные в БД"""
     response = requests.get(url)
     response.raise_for_status()
     place_raw = response.json()
+
     imgs = place_raw["imgs"]
-    img_names = []
-    img_path = Path(base_path, 'static/imgs_data')
+    img_names = [get_filename_and_ext(img_url)[0] for img_url in imgs]
+    img_path = base_path / 'static/imgs_data'
     img_path.mkdir(parents=True, exist_ok=True)
-    for img_url in imgs:
-        img_name, _ = get_filename_and_ext(img_url)
-        img_names.append(img_name)
-        download_img(img_url, img_name, img_path)
+
     title = place_raw["title"]
     location, created = PlaceName.objects.update_or_create(
         title=title,
@@ -52,12 +51,14 @@ def upload_data_to_db(url):
         longitude=place_raw["coordinates"]["lng"],
         defaults={'title': title}
     )
-    for img in img_names:
+
+    for img_url, img_name in zip(imgs, img_names):
         img_upload = PlaceImage.objects.create(place=location)
-        with open(f'{img_path}/{img}', 'rb') as f:
-            file = f.read()
-            img_upload.picture.save(img, ContentFile(file), save=True)
-    return 'OK'
+        img_response = requests.get(img_url, stream=True)
+        img_response.raise_for_status()
+        img_upload.picture.save(img_name, ContentFile(img_response.content), save=True)
+
+    return f"Данные для места '{title}' успешно загружены. Загружено {len(imgs)} изображений."
 
 
 class Command(BaseCommand):
