@@ -1,7 +1,7 @@
 import argparse
 import requests
 from os.path import splitext, split
-from pathlib import Path
+from django.core.exceptions import MultipleObjectsReturned
 from urllib.parse import urlsplit, unquote
 
 from django.core.management.base import BaseCommand
@@ -43,14 +43,17 @@ def upload_data_to_db(url):
     img_path.mkdir(parents=True, exist_ok=True)
 
     title = place_raw["title"]
-    location, created = PlaceName.objects.update_or_create(
-        title=title,
-        short_description=place_raw["description_short"],
-        long_description=place_raw["description_long"],
-        latitude=place_raw["coordinates"]["lat"],
-        longitude=place_raw["coordinates"]["lng"],
-        defaults={'title': title}
-    )
+    try:
+        location, created = PlaceName.objects.update_or_create(
+            title=title,
+            short_description=place_raw["description_short"],
+            long_description=place_raw["description_long"],
+            latitude=place_raw["coordinates"]["lat"],
+            longitude=place_raw["coordinates"]["lng"],
+            defaults={'title': title}
+        )
+    except MultipleObjectsReturned:
+        location = PlaceName.objects.filter(title=title).first()
 
     for img_url, img_name in zip(imgs, img_names):
         img_upload = PlaceImage.objects.create(place=location)
