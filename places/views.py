@@ -33,12 +33,11 @@ def index(request):
 
 
 def get_details_json(request, pk):
-    location = get_object_or_404(PlaceName, pk=pk)
+    location = get_object_or_404(PlaceName.objects.prefetch_related('pictures'), pk=pk)
+
     location_information = {
         "title": location.title,
-        "imgs": [
-            pic.picture.url for pic in location.pictures.all().order_by('sequence_number')
-        ],
+        "imgs": [pic.picture.url for pic in location.pictures.order_by('sequence_number')],
         "description_short": location.short_description,
         "description_long": location.long_description,
         "coordinates": {
@@ -46,4 +45,5 @@ def get_details_json(request, pk):
             "lat": location.latitude
         }
     }
+
     return JsonResponse(location_information, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
