@@ -40,9 +40,6 @@ def upload_data_to_db(url):
 
     imgs = place_raw["imgs"]
     img_names = [get_filename_and_ext(img_url)[0] for img_url in imgs]
-    img_path = base_path / 'static/imgs_data'
-    img_path.mkdir(parents=True, exist_ok=True)
-
     title = place_raw["title"]
     try:
         location, created = PlaceName.objects.update_or_create(
@@ -50,8 +47,7 @@ def upload_data_to_db(url):
             short_description=place_raw["description_short"],
             long_description=place_raw["description_long"],
             latitude=place_raw["coordinates"]["lat"],
-            longitude=place_raw["coordinates"]["lng"],
-            defaults={'title': title}
+            longitude=place_raw["coordinates"]["lng"]
         )
     except MultipleObjectsReturned:
         location = PlaceName.objects.filter(title=title).first()
