@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.html import format_html
+
 from tinymce.models import HTMLField
 
 from where_to_go_v2 import settings

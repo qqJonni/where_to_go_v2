@@ -1,7 +1,8 @@
 import argparse
 import requests
-from os.path import splitext, split
+
 from django.core.exceptions import MultipleObjectsReturned
+from os.path import splitext, split
 from urllib.parse import urlsplit, unquote
 
 from django.core.management.base import BaseCommand

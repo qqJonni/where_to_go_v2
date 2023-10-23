@@ -1,6 +1,6 @@
-from django.contrib import admin
 from adminsortable2.admin import SortableAdminBase, SortableInlineAdminMixin
 
+from django.contrib import admin
 from places.models import PlaceName, PlaceImage
 
 
