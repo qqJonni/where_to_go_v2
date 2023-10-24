@@ -24,14 +24,6 @@ def get_filename_and_ext(img_url):
     return filename, extension
 
 
-def download_img(img_url, img_name, img_path):
-    """Download the image"""
-    response = requests.get(img_url)
-    response.raise_for_status()
-    with open(f'{img_path}/{img_name}', 'wb') as file:
-        file.write(response.content)
-
-
 def upload_data_to_db(url):
     """Загружаем данные в БД"""
     response = requests.get(url)
@@ -39,7 +31,6 @@ def upload_data_to_db(url):
     place_raw = response.json()
 
     imgs = place_raw["imgs"]
-    img_names = [get_filename_and_ext(img_url)[0] for img_url in imgs]
     title = place_raw["title"]
     try:
         location, created = PlaceName.objects.update_or_create(
@@ -50,13 +41,14 @@ def upload_data_to_db(url):
             longitude=place_raw["coordinates"]["lng"]
         )
     except MultipleObjectsReturned:
-        location = PlaceName.objects.filter(title=title).first()
+        return print("Ошибка: Существует несколько объектов с таким заголовком.")
 
-    for img_url, img_name in zip(imgs, img_names):
+    for img_url in imgs:
+        img_name, img_extension = get_filename_and_ext(img_url)
         img_upload = PlaceImage.objects.create(place=location)
         img_response = requests.get(img_url, stream=True)
         img_response.raise_for_status()
-        img_upload.picture.save(img_name, ContentFile(img_response.content), save=True)
+        img_upload.picture.save(f"{img_name}.{img_extension}", ContentFile(img_response.content))
 
     return f"Данные для места '{title}' успешно загружены. Загружено {len(imgs)} изображений."
 
